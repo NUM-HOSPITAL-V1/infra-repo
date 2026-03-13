@@ -1,0 +1,16 @@
+nameOverride: ""
+fullNameOverride: ""
+
+ingress:
+  enabled: true
+  className: traefik
+  annotations:
+    traefik.ingress.kubernetes.io/router.entrypoints: web
+  frontendPath: /
+  apiPath: /api
+  frontendService:
+    name: hospital-frontend
+    port: 3000
+  backendService:
+    name: hospital-backend
+    port: 8000

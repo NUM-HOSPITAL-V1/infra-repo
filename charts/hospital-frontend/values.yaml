@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: nurlan123/hospital-frontend
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullNameOverride: ""
+
+service:
+  type: ClusterIP
+  port: 3000
+  targetPort: 3000
+
+env:
+  nextPublicApiUrl: /api
+
+resources:
+  requests:
+    memory: "32Mi"
+    cpu: "100m"
+  limits:
+    memory: "100Mi"
+    cpu: "250m"

@@ -1,9 +1,9 @@
-name: Deploy to K3s (Helm)
+name: Deploy to K3s  Front-end (Helm)
 run-name: "Deploy K3s | ${{ github.event_name }}"
 
 on:
   repository_dispatch:
-    types: [image_built]
+    types: [frontend_image_built]
   workflow_dispatch:
     inputs:
       image_tag:
@@ -21,7 +21,7 @@ jobs:
 
     env:
       K3S_NAMESPACE: num
-      RELEASE_NAME: hospital-backend
+      RELEASE_NAME: hospital-frontend
 
     steps:
       - uses: actions/checkout@v4
@@ -85,33 +85,13 @@ jobs:
         run: |
           sudo kubectl create namespace $K3S_NAMESPACE --dry-run=client -o yaml | sudo kubectl apply -f -
 
-      - name: Upsert backend secret
+      - name: Deploy Frontend (Helm)
         run: |
-          cat <<EOF | sudo kubectl apply -n $K3S_NAMESPACE -f -
-          apiVersion: v1
-          kind: Secret
-          metadata:
-            name: hospital-secrets
-          type: Opaque
-          stringData:
-            mongodb_uri: "${{ secrets.MONGODB_URI }}"
-            JWT_SECRET: "${{ secrets.JWT_SECRET }}"
-            REFRESH_SECRET: "${{ secrets.REFRESH_SECRET }}"
-          EOF
-
-      # Production-д чинь энэ "delete drift" хэсэг олонтаа хэрэггүй болдог.
-      # Chart-аа зөв болговол upgrade өөрөө асуудалгүй явах ёстой.
-      # Гэхдээ одоохондоо үлдээж болно.
-
-      - name: Deploy Backend (Helm)
-        run: |
-          helm upgrade --install $RELEASE_NAME ./charts/hospital-backend \
+          helm upgrade --install $RELEASE_NAME ./charts/hospital-frontend \
             -n $K3S_NAMESPACE \
             --create-namespace \
             --set image.repository=$IMAGE_REPO \
             --set image.tag=$IMAGE_TAG \
-            --set secrets.create=false \
-            --set secrets.existingSecret=hospital-secrets \
             --wait --timeout 600s
 
       - name: Debug rollout on failure
