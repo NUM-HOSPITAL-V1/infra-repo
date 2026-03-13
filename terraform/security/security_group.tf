@@ -4,8 +4,8 @@ locals {
     format(
       "%s-%s-%s-%s",
       rule.protocol,
-      tostring(try(rule.from_port, 0)),
-      tostring(try(rule.to_port, 0)),
+      tostring(coalesce(try(rule.from_port, null), 0)),
+      tostring(coalesce(try(rule.to_port, null), 0)),
       replace(rule.cidr_ipv4, "/", "_")
     ) => rule
   } : {}
@@ -15,8 +15,8 @@ locals {
     format(
       "%s-%s-%s-%s",
       rule.protocol,
-      tostring(try(rule.from_port, 0)),
-      tostring(try(rule.to_port, 0)),
+      tostring(coalesce(try(rule.from_port, null), 0)),
+      tostring(coalesce(try(rule.to_port, null), 0)),
       replace(rule.cidr_ipv4, "/", "_")
     ) => rule
   }
@@ -26,8 +26,8 @@ locals {
     format(
       "%s-%s-%s-%s",
       rule.protocol,
-      tostring(try(rule.from_port, 0)),
-      tostring(try(rule.to_port, 0)),
+      tostring(coalesce(try(rule.from_port, null), 0)),
+      tostring(coalesce(try(rule.to_port, null), 0)),
       replace(rule.cidr_ipv4, "/", "_")
     ) => rule
   } : {}
@@ -37,8 +37,8 @@ locals {
     format(
       "%s-%s-%s-%s",
       rule.protocol,
-      tostring(try(rule.from_port, 0)),
-      tostring(try(rule.to_port, 0)),
+      tostring(coalesce(try(rule.from_port, null), 0)),
+      tostring(coalesce(try(rule.to_port, null), 0)),
       replace(rule.cidr_ipv4, "/", "_")
     ) => rule
   }
