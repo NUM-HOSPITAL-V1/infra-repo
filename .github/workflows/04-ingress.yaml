@@ -1,0 +1,80 @@
+name: Deploy to K3s ingress(Helm)
+run-name: "Deploy Ingress | ${{ github.event_name }}"
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "charts/hospital-ingress/**"
+      - ".github/workflows/04-ingress.yaml"
+
+jobs:
+  deploy:
+    runs-on: [self-hosted, Linux, X64]
+    environment: production
+
+    env:
+      K3S_NAMESPACE: num
+      RELEASE_NAME: hospital-ingress
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Debug runner host
+        run: |
+          hostname
+          whoami
+          helm version
+          sudo kubectl version --client
+
+      - name: Set up kubeconfig
+        env:
+          KUBECONFIG_CONTENT: ${{ secrets.KUBECONFIG }}
+        run: |
+          set -euo pipefail
+          mkdir -p "$HOME/.kube"
+
+          if [ -n "${KUBECONFIG_CONTENT:-}" ]; then
+            printf '%s\n' "${KUBECONFIG_CONTENT}" | tr -d '\r' > "$HOME/.kube/config"
+          fi
+
+          if ! kubectl --kubeconfig "$HOME/.kube/config" cluster-info >/dev/null 2>&1; then
+            echo "Provided KUBECONFIG cannot reach cluster. Falling back to /etc/rancher/k3s/k3s.yaml"
+            sudo cp /etc/rancher/k3s/k3s.yaml "$HOME/.kube/config"
+            sudo chown "$(id -u):$(id -g)" "$HOME/.kube/config"
+          fi
+
+          chmod 600 "$HOME/.kube/config"
+          echo "KUBECONFIG=$HOME/.kube/config" >> "$GITHUB_ENV"
+          kubectl --kubeconfig "$HOME/.kube/config" cluster-info
+
+      - name: Ensure namespace exists
+        run: |
+          sudo kubectl create namespace $K3S_NAMESPACE --dry-run=client -o yaml | sudo kubectl apply -f -
+
+      - name: Lint ingress chart
+        run: |
+          helm lint ./charts/hospital-ingress
+
+      - name: Deploy Ingress (Helm)
+        run: |
+          helm upgrade --install $RELEASE_NAME ./charts/hospital-ingress \
+            -n $K3S_NAMESPACE \
+            --create-namespace \
+            --wait --timeout 600s
+
+      - name: Debug rollout on failure
+        if: ${{ failure() }}
+        run: |
+          set +e
+          sudo kubectl get ingress -n "$K3S_NAMESPACE"
+          sudo kubectl describe ingress/"$RELEASE_NAME" -n "$K3S_NAMESPACE"
+          sudo kubectl get events -n "$K3S_NAMESPACE" --sort-by=.metadata.creationTimestamp | tail -n 100
+
+      - name: Verify
+        run: |
+          helm status $RELEASE_NAME -n $K3S_NAMESPACE
+          sudo kubectl get ingress -n $K3S_NAMESPACE
+          sudo kubectl describe ingress/$RELEASE_NAME -n $K3S_NAMESPACE
