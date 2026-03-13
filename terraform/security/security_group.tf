@@ -1,3 +1,49 @@
+locals {
+  control_ingress_rules = var.manage_ingress_rules ? {
+    for rule in var.ingress_rules :
+    format(
+      "%s-%s-%s-%s",
+      rule.protocol,
+      tostring(try(rule.from_port, 0)),
+      tostring(try(rule.to_port, 0)),
+      replace(rule.cidr_ipv4, "/", "_")
+    ) => rule
+  } : {}
+
+  control_egress_rules = {
+    for rule in var.egress_rules :
+    format(
+      "%s-%s-%s-%s",
+      rule.protocol,
+      tostring(try(rule.from_port, 0)),
+      tostring(try(rule.to_port, 0)),
+      replace(rule.cidr_ipv4, "/", "_")
+    ) => rule
+  }
+
+  worker_ingress_rules = var.manage_ingress_rules ? {
+    for rule in var.worker_ingress_rules :
+    format(
+      "%s-%s-%s-%s",
+      rule.protocol,
+      tostring(try(rule.from_port, 0)),
+      tostring(try(rule.to_port, 0)),
+      replace(rule.cidr_ipv4, "/", "_")
+    ) => rule
+  } : {}
+
+  worker_egress_rules = {
+    for rule in var.worker_egress_rules :
+    format(
+      "%s-%s-%s-%s",
+      rule.protocol,
+      tostring(try(rule.from_port, 0)),
+      tostring(try(rule.to_port, 0)),
+      replace(rule.cidr_ipv4, "/", "_")
+    ) => rule
+  }
+}
+
 resource "aws_security_group" "control" {
   name        = var.security_group_name
   description = coalesce(var.security_group_description, "Security group for ${var.instance_name}")
@@ -7,10 +53,7 @@ resource "aws_security_group" "control" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "control" {
-  for_each = {
-    for idx, rule in var.ingress_rules : idx => rule
-    if var.manage_ingress_rules
-  }
+  for_each = local.control_ingress_rules
 
   security_group_id = aws_security_group.control.id
   description       = try(each.value.description, null)
@@ -21,9 +64,7 @@ resource "aws_vpc_security_group_ingress_rule" "control" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "control" {
-  for_each = {
-    for idx, rule in var.egress_rules : idx => rule
-  }
+  for_each = local.control_egress_rules
 
   security_group_id = aws_security_group.control.id
   description       = try(each.value.description, null)
@@ -42,10 +83,7 @@ resource "aws_security_group" "worker" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "worker" {
-  for_each = {
-    for idx, rule in var.worker_ingress_rules : idx => rule
-    if var.manage_ingress_rules
-  }
+  for_each = local.worker_ingress_rules
 
   security_group_id = aws_security_group.worker.id
   description       = try(each.value.description, null)
@@ -56,9 +94,7 @@ resource "aws_vpc_security_group_ingress_rule" "worker" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "worker" {
-  for_each = {
-    for idx, rule in var.worker_egress_rules : idx => rule
-  }
+  for_each = local.worker_egress_rules
 
   security_group_id = aws_security_group.worker.id
   description       = try(each.value.description, null)

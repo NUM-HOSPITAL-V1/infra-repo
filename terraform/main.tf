@@ -71,8 +71,38 @@ moved {
 }
 
 moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.control["0"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.control["tcp-22-22-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.control["1"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.control["tcp-80-80-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.control["2"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.control["tcp-443-443-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.control["3"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.control["tcp-6443-6443-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.control["4"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.control["tcp-3000-3003-0.0.0.0_0"]
+}
+
+moved {
   from = aws_vpc_security_group_egress_rule.control
   to   = module.security.aws_vpc_security_group_egress_rule.control
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_egress_rule.control["0"]
+  to   = module.security.aws_vpc_security_group_egress_rule.control["-1-0-0-0.0.0.0_0"]
 }
 
 moved {
@@ -81,6 +111,31 @@ moved {
 }
 
 moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.worker["0"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-22-22-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.worker["1"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-80-80-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.worker["2"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-443-443-0.0.0.0_0"]
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_ingress_rule.worker["3"]
+  to   = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-6443-6443-0.0.0.0_0"]
+}
+
+moved {
   from = aws_vpc_security_group_egress_rule.worker
   to   = module.security.aws_vpc_security_group_egress_rule.worker
+}
+
+moved {
+  from = module.security.aws_vpc_security_group_egress_rule.worker["0"]
+  to   = module.security.aws_vpc_security_group_egress_rule.worker["-1-0-0-0.0.0.0_0"]
 }
