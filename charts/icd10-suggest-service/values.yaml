@@ -44,3 +44,10 @@ readinessProbe:
     port: http
   initialDelaySeconds: 20
   periodSeconds: 10
+
+nodeSelector:
+  node-role: worker
+
+affinity: {}
+
+tolerations: []

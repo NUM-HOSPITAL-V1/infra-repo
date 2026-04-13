@@ -23,3 +23,10 @@ resources:
   limits:
     memory: "100Mi"
     cpu: "250m"
+
+nodeSelector:
+  node-role: worker
+
+affinity: {}
+
+tolerations: []

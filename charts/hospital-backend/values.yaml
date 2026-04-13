@@ -39,3 +39,10 @@ secrets:
   mongodb_uri: ""
   JWT_SECRET: ""
   REFRESH_SECRET: ""
+
+nodeSelector:
+  node-role: worker
+
+affinity: {}
+
+tolerations: []
