@@ -1,5 +1,5 @@
-name: Deploy Hospital Ingress
-run-name: "Deploy Hospital Ingress | ${{ github.event_name }}"
+name: Deploy ingress-nginx Controller
+run-name: "Deploy ingress-nginx | ${{ github.event_name }}"
 
 on:
   workflow_dispatch:
@@ -7,8 +7,8 @@ on:
     branches:
       - main
     paths:
-      - "charts/hospital-ingress/**"
-      - ".github/workflows/04-ingress.yaml"
+      - "ingress-nginx/**"
+      - ".github/workflows/01-deploy-ingress-nginx.yaml"
 
 jobs:
   deploy:
@@ -16,8 +16,8 @@ jobs:
     environment: production
 
     env:
-      K3S_NAMESPACE: num
-      RELEASE_NAME: hospital-ingress
+      INGRESS_NAMESPACE: ingress-nginx
+      RELEASE_NAME: ingress-nginx
 
     steps:
       - uses: actions/checkout@v4
@@ -50,32 +50,35 @@ jobs:
           echo "KUBECONFIG=$HOME/.kube/config" >> "$GITHUB_ENV"
           kubectl --kubeconfig "$HOME/.kube/config" cluster-info
 
-      - name: Ensure namespace exists
+      - name: Ensure ingress namespace exists
         run: |
-          sudo kubectl create namespace $K3S_NAMESPACE --dry-run=client -o yaml | sudo kubectl apply -f -
+          sudo kubectl create namespace $INGRESS_NAMESPACE --dry-run=client -o yaml | sudo kubectl apply -f -
 
-      - name: Lint ingress chart
+      - name: Add ingress-nginx Helm repo
         run: |
-          helm lint ./charts/hospital-ingress
+          helm repo add ingress-nginx https://kubernetes.github.io/ingress-nginx
+          helm repo update ingress-nginx
 
-      - name: Deploy Ingress (Helm)
+      - name: Deploy ingress-nginx
         run: |
-          helm upgrade --install $RELEASE_NAME ./charts/hospital-ingress \
-            -n $K3S_NAMESPACE \
+          helm upgrade --install $RELEASE_NAME ingress-nginx/ingress-nginx \
+            -n $INGRESS_NAMESPACE \
             --create-namespace \
+            -f ./ingress-nginx/values.yaml \
             --wait --timeout 600s
 
       - name: Debug rollout on failure
         if: ${{ failure() }}
         run: |
           set +e
-          sudo kubectl get ingress -n "$K3S_NAMESPACE"
-          sudo kubectl describe ingress/"$RELEASE_NAME" -n "$K3S_NAMESPACE"
-          sudo kubectl get events -n "$K3S_NAMESPACE" --sort-by=.metadata.creationTimestamp | tail -n 100
+          sudo kubectl get pods -n "$INGRESS_NAMESPACE" -o wide
+          sudo kubectl describe deployment -n "$INGRESS_NAMESPACE"
+          sudo kubectl describe daemonset -n "$INGRESS_NAMESPACE"
+          sudo kubectl get events -n "$INGRESS_NAMESPACE" --sort-by=.metadata.creationTimestamp | tail -n 100
 
       - name: Verify
         run: |
-          helm status $RELEASE_NAME -n $K3S_NAMESPACE
-          sudo kubectl get ingress -n $K3S_NAMESPACE
-          sudo kubectl describe ingress/$RELEASE_NAME -n $K3S_NAMESPACE
+          helm status $RELEASE_NAME -n $INGRESS_NAMESPACE
+          sudo kubectl get pods -n $INGRESS_NAMESPACE -o wide
+          sudo kubectl get svc -n $INGRESS_NAMESPACE
           sudo kubectl get ingressclass

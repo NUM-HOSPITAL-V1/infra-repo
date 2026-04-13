@@ -3,9 +3,8 @@ fullNameOverride: ""
 
 ingress:
   enabled: true
-  className: traefik
-  annotations:
-    traefik.ingress.kubernetes.io/router.entrypoints: web
+  className: nginx
+  annotations: {}
   path: /
   gatewayService:
     name: hospital-gateway
