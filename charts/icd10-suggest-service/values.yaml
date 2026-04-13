@@ -26,6 +26,9 @@ resources:
     memory: "768Mi"
     cpu: "750m"
 
+strategy:
+  type: Recreate
+
 persistence:
   enabled: true
   size: 1Gi
@@ -40,9 +43,9 @@ livenessProbe:
 
 readinessProbe:
   httpGet:
-    path: /actuator/health/readiness
+    path: /api/diagnosis/health
     port: http
-  initialDelaySeconds: 20
+  initialDelaySeconds: 30
   periodSeconds: 10
 
 nodeSelector:
