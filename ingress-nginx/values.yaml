@@ -4,7 +4,7 @@ controller:
   dnsPolicy: ClusterFirstWithHostNet
 
   nodeSelector:
-    node-role.kubernetes.io/control-plane: ""
+    node-role.kubernetes.io/control-plane: "true"
 
   hostPort:
     enabled: true
