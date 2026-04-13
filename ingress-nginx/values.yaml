@@ -4,7 +4,7 @@ controller:
   dnsPolicy: ClusterFirstWithHostNet
 
   nodeSelector:
-    node-role.kubernetes.io/control-plane: "true"
+    node-role: worker
 
   hostPort:
     enabled: true
@@ -30,15 +30,7 @@ controller:
     enabled: false
 
   tolerations:
-    - key: node-role.kubernetes.io/control-plane
-      operator: Exists
-    - key: node-role.kubernetes.io/master
-      operator: Exists
-    - key: CriticalAddonsOnly
-      operator: Exists
-    - key: node.kubernetes.io/disk-pressure
-      operator: Exists
-      effect: NoSchedule
+    []
 
 defaultBackend:
   enabled: true
