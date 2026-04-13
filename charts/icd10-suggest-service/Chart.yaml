@@ -1,0 +1,6 @@
+apiVersion: v2
+name: icd10-suggest-service
+description: Helm chart for the ICD-10 diagnosis suggestion service
+type: application
+version: 0.1.0
+appVersion: "latest"

@@ -1,0 +1,46 @@
+replicaCount: 1
+
+image:
+  repository: nurlannn/icd10-suggest-service
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullNameOverride: "icd10-suggest-service"
+
+service:
+  type: ClusterIP
+  port: 8080
+  targetPort: 8080
+
+env:
+  icd10ApiUrl: "http://icd10-code-service:8082/api/icd10"
+  springDatasourceUrl: "jdbc:h2:file:/data/hospital_db"
+  springH2ConsoleEnabled: "false"
+
+resources:
+  requests:
+    memory: "256Mi"
+    cpu: "150m"
+  limits:
+    memory: "768Mi"
+    cpu: "750m"
+
+persistence:
+  enabled: true
+  size: 1Gi
+  accessMode: ReadWriteOnce
+
+livenessProbe:
+  httpGet:
+    path: /api/diagnosis/health
+    port: http
+  initialDelaySeconds: 30
+  periodSeconds: 15
+
+readinessProbe:
+  httpGet:
+    path: /actuator/health/readiness
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 10

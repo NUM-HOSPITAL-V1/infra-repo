@@ -1,0 +1,44 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "icd10-suggest-service.fullname" . }}
+  labels:
+    {{- include "icd10-suggest-service.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "icd10-suggest-service.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "icd10-suggest-service.selectorLabels" . | nindent 8 }}
+    spec:
+      containers:
+        - name: {{ include "icd10-suggest-service.name" . }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          env:
+            - name: ICD10_API_URL
+              value: {{ .Values.env.icd10ApiUrl | quote }}
+            - name: SPRING_DATASOURCE_URL
+              value: {{ .Values.env.springDatasourceUrl | quote }}
+            - name: SPRING_H2_CONSOLE_ENABLED
+              value: {{ .Values.env.springH2ConsoleEnabled | quote }}
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
+          volumeMounts:
+            - name: data
+              mountPath: /data
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: {{ include "icd10-suggest-service.fullname" . }}

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: icd10-code-service
+description: Helm chart for the ICD-10 code lookup service
+type: application
+version: 0.1.0
+appVersion: "latest"

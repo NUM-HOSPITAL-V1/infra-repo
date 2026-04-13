@@ -28,6 +28,10 @@ resources:
     memory: "512Mi"
     cpu: "500m"
 
+env:
+  icd10SuggestBaseUrl: "http://icd10-suggest-service:8080/api"
+  icd10SuggestTimeoutMs: "5000"
+
 secrets:
   create: true
   name: hospital-secrets

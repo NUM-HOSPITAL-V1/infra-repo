@@ -1,29 +1,30 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ include "hospital-frontend.fullname" . }}
+  name: {{ include "icd10-code-service.fullname" . }}
   labels:
-    {{- include "hospital-frontend.labels" . | nindent 4 }}
+    {{- include "icd10-code-service.labels" . | nindent 4 }}
 spec:
   replicas: {{ .Values.replicaCount }}
   selector:
     matchLabels:
-      {{- include "hospital-frontend.selectorLabels" . | nindent 6 }}
+      {{- include "icd10-code-service.selectorLabels" . | nindent 6 }}
   template:
     metadata:
       labels:
-        {{- include "hospital-frontend.selectorLabels" . | nindent 8 }}
+        {{- include "icd10-code-service.selectorLabels" . | nindent 8 }}
     spec:
       containers:
-        - name: {{ include "hospital-frontend.name" . }}
+        - name: {{ include "icd10-code-service.name" . }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
-          env:
-            - name: NEXT_PUBLIC_BACKEND_URL
-              value: {{ .Values.env.nextPublicBackendUrl | quote }}
           ports:
             - name: http
               containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
+          livenessProbe:
+            {{- toYaml .Values.livenessProbe | nindent 12 }}
+          readinessProbe:
+            {{- toYaml .Values.readinessProbe | nindent 12 }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

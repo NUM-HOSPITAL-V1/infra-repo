@@ -40,5 +40,9 @@ spec:
                 secretKeyRef:
                   name: {{ $secretName }}
                   key: REFRESH_SECRET
+            - name: ICD10_SUGGEST_BASE_URL
+              value: {{ .Values.env.icd10SuggestBaseUrl | quote }}
+            - name: ICD10_SUGGEST_TIMEOUT_MS
+              value: {{ .Values.env.icd10SuggestTimeoutMs | quote }}
           resources:
             {{- toYaml .Values.resources | nindent 12 }}

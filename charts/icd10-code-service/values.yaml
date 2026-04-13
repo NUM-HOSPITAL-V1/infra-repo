@@ -1,0 +1,36 @@
+replicaCount: 1
+
+image:
+  repository: nurlannn/icd10-code-service
+  tag: ""
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullNameOverride: "icd10-code-service"
+
+service:
+  type: ClusterIP
+  port: 8082
+  targetPort: 8082
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+livenessProbe:
+  httpGet:
+    path: /api/icd10
+    port: http
+  initialDelaySeconds: 20
+  periodSeconds: 15
+
+readinessProbe:
+  httpGet:
+    path: /api/icd10
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10

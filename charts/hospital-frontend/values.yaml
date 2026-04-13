@@ -1,7 +1,7 @@
 replicaCount: 1
 
 image:
-  repository: nurlan123/hospital-frontend
+  repository: nurlan123/hospital-front-end
   tag: ""
   pullPolicy: IfNotPresent
 
@@ -14,7 +14,7 @@ service:
   targetPort: 3000
 
 env:
-  nextPublicApiUrl: /api
+  nextPublicBackendUrl: /api
 
 resources:
   requests:
