@@ -3,6 +3,9 @@ controller:
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
 
+  nodeSelector:
+    node-role.kubernetes.io/control-plane: ""
+
   hostPort:
     enabled: true
     ports:
