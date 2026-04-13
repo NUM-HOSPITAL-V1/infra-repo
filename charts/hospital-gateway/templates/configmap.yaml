@@ -34,12 +34,38 @@ data:
             return 301 /api/;
         }
 
+        location = /api/status {
+            proxy_pass http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }};
+            proxy_redirect off;
+        }
+
+        location = /api/health {
+            proxy_pass http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }};
+            proxy_redirect off;
+        }
+
+        location ^~ /api/auth/ {
+            proxy_pass http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }};
+            proxy_redirect off;
+        }
+
         location / {
             proxy_pass http://{{ .Values.frontend.serviceName }}:{{ .Values.frontend.servicePort }};
             proxy_redirect off;
         }
 
+        location = /_gateway/auth {
+            internal;
+            proxy_pass http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }}{{ .Values.backend.authValidationPath }};
+            proxy_pass_request_body off;
+            proxy_set_header Content-Length "";
+            proxy_set_header Authorization $http_authorization;
+            proxy_set_header X-Original-URI $request_uri;
+            proxy_set_header X-Original-Method $request_method;
+        }
+
         location /api/ {
+            auth_request /_gateway/auth;
             proxy_pass http://{{ .Values.backend.serviceName }}:{{ .Values.backend.servicePort }};
             proxy_redirect off;
             proxy_next_upstream error timeout http_500 http_502 http_503 http_504;
