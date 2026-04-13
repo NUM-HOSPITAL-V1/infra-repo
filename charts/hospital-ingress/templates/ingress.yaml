@@ -14,18 +14,11 @@ spec:
   rules:
     - http:
         paths:
-          - path: {{ .Values.ingress.apiPath }}
+          - path: {{ .Values.ingress.path }}
             pathType: Prefix
             backend:
               service:
-                name: {{ .Values.ingress.backendService.name }}
+                name: {{ .Values.ingress.gatewayService.name }}
                 port:
-                  number: {{ .Values.ingress.backendService.port }}
-          - path: {{ .Values.ingress.frontendPath }}
-            pathType: Prefix
-            backend:
-              service:
-                name: {{ .Values.ingress.frontendService.name }}
-                port:
-                  number: {{ .Values.ingress.frontendService.port }}
+                  number: {{ .Values.ingress.gatewayService.port }}
 {{- end }}

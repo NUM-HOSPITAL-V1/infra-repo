@@ -6,11 +6,7 @@ ingress:
   className: traefik
   annotations:
     traefik.ingress.kubernetes.io/router.entrypoints: web
-  frontendPath: /
-  apiPath: /api
-  frontendService:
-    name: hospital-frontend
-    port: 3000
-  backendService:
-    name: hospital-backend
-    port: 8000
+  path: /
+  gatewayService:
+    name: hospital-gateway
+    port: 80

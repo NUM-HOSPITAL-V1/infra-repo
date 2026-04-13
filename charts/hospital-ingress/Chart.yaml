@@ -1,6 +1,6 @@
 apiVersion: v2
 name: hospital-ingress
-description: Shared ingress for hospital frontend and backend services
+description: Edge ingress routing for the in-cluster hospital gateway
 type: application
 version: 0.1.0
 appVersion: "1.0"
