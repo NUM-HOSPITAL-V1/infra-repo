@@ -1,0 +1,56 @@
+replicaCount: 1
+
+image:
+  repository: postgres
+  tag: "16-alpine"
+  pullPolicy: IfNotPresent
+
+nameOverride: ""
+fullNameOverride: "customer-registration-db"
+
+service:
+  type: ClusterIP
+  port: 5432
+  targetPort: 5432
+
+env:
+  postgresDb: "customer_db"
+
+secrets:
+  create: true
+  name: customer-registration-db-secrets
+  existingSecret: ""
+  postgresUser: "postgres"
+  postgresPassword: "postgres"
+
+persistence:
+  enabled: true
+  size: 1Gi
+  accessMode: ReadWriteOnce
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "512Mi"
+    cpu: "500m"
+
+livenessProbe:
+  tcpSocket:
+    port: postgres
+  initialDelaySeconds: 20
+  periodSeconds: 15
+
+readinessProbe:
+  tcpSocket:
+    port: postgres
+  initialDelaySeconds: 10
+  periodSeconds: 10
+
+nodeSelector:
+  node-role: worker
+
+affinity: {}
+
+tolerations: []
