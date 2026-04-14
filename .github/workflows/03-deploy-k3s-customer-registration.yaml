@@ -117,15 +117,20 @@ jobs:
 
       - name: Deploy customer registration DB
         run: |
+          sudo kubectl scale deployment/$DB_RELEASE_NAME -n $K3S_NAMESPACE --replicas=0 --ignore-not-found=true || true
+          sudo kubectl wait --for=delete pod -l app.kubernetes.io/instance=$DB_RELEASE_NAME -n $K3S_NAMESPACE --timeout=120s || true
           helm upgrade --install $DB_RELEASE_NAME ./charts/customer-registration-db \
             -n $K3S_NAMESPACE \
             --create-namespace \
             --set secrets.create=false \
             --set secrets.existingSecret=customer-registration-db-secrets \
+            --set persistence.enabled=false \
             --wait --timeout 600s
 
       - name: Deploy customer registration app
         run: |
+          sudo kubectl scale deployment/$APP_RELEASE_NAME -n $K3S_NAMESPACE --replicas=0 --ignore-not-found=true || true
+          sudo kubectl wait --for=delete pod -l app.kubernetes.io/instance=$APP_RELEASE_NAME -n $K3S_NAMESPACE --timeout=120s || true
           helm upgrade --install $APP_RELEASE_NAME ./charts/customer-registration \
             -n $K3S_NAMESPACE \
             --create-namespace \

@@ -1,5 +1,8 @@
 replicaCount: 1
 
+deploymentStrategy:
+  type: Recreate
+
 image:
   repository: customer-registration
   pullPolicy: IfNotPresent
@@ -30,11 +33,20 @@ secrets:
 
 resources:
   requests:
-    memory: "256Mi"
-    cpu: "150m"
+    memory: "192Mi"
+    cpu: "100m"
   limits:
-    memory: "768Mi"
-    cpu: "750m"
+    memory: "512Mi"
+    cpu: "500m"
+
+waitForDatabase:
+  enabled: true
+  image:
+    repository: busybox
+    tag: "1.36"
+    pullPolicy: IfNotPresent
+  host: customer-registration-db
+  port: 5432
 
 livenessProbe:
   httpGet:
