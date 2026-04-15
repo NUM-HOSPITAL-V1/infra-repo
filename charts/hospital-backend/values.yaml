@@ -22,11 +22,11 @@ containerPort: 8000
 
 resources:
   requests:
-    memory: "128Mi"
-    cpu: "100m"
+    memory: "96Mi"
+    cpu: "75m"
   limits:
-    memory: "512Mi"
-    cpu: "500m"
+    memory: "256Mi"
+    cpu: "250m"
 
 env:
   icd10SuggestBaseUrl: "http://icd10-suggest-service:8080/api"
@@ -41,8 +41,7 @@ secrets:
   JWT_SECRET: ""
   REFRESH_SECRET: ""
 
-nodeSelector:
-  node-role: worker
+nodeSelector: {}
 
 affinity: {}
 

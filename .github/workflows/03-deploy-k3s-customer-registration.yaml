@@ -86,6 +86,13 @@ jobs:
 
       - name: Upsert customer registration DB secret
         run: |
+          set -euo pipefail
+
+          if [ -z "${{ secrets.CUSTOMER_DB_USERNAME }}" ] || [ -z "${{ secrets.CUSTOMER_DB_PASSWORD }}" ]; then
+            echo "CUSTOMER_DB_USERNAME or CUSTOMER_DB_PASSWORD is empty. Set both GitHub environment secrets before deploying."
+            exit 1
+          fi
+
           cat <<EOF | sudo kubectl apply -n $K3S_NAMESPACE -f -
           apiVersion: v1
           kind: Secret
@@ -99,6 +106,13 @@ jobs:
 
       - name: Upsert customer registration app secret
         run: |
+          set -euo pipefail
+
+          if [ -z "${{ secrets.CUSTOMER_DB_USERNAME }}" ] || [ -z "${{ secrets.CUSTOMER_DB_PASSWORD }}" ]; then
+            echo "CUSTOMER_DB_USERNAME or CUSTOMER_DB_PASSWORD is empty. Set both GitHub environment secrets before deploying."
+            exit 1
+          fi
+
           cat <<EOF | sudo kubectl apply -n $K3S_NAMESPACE -f -
           apiVersion: v1
           kind: Secret
@@ -117,15 +131,26 @@ jobs:
 
       - name: Deploy customer registration DB
         run: |
+          set -euo pipefail
+
           sudo kubectl scale deployment/$DB_RELEASE_NAME -n $K3S_NAMESPACE --replicas=0 --ignore-not-found=true || true
           sudo kubectl wait --for=delete pod -l app.kubernetes.io/instance=$DB_RELEASE_NAME -n $K3S_NAMESPACE --timeout=120s || true
-          helm upgrade --install $DB_RELEASE_NAME ./charts/customer-registration-db \
+          if ! helm upgrade --install $DB_RELEASE_NAME ./charts/customer-registration-db \
             -n $K3S_NAMESPACE \
             --create-namespace \
             --set secrets.create=false \
             --set secrets.existingSecret=customer-registration-db-secrets \
             --set persistence.enabled=false \
-            --wait --timeout 600s
+            --wait --timeout 600s; then
+            sudo kubectl get pods -n "$K3S_NAMESPACE" -o wide || true
+            sudo kubectl describe deployment/"$DB_RELEASE_NAME" -n "$K3S_NAMESPACE" || true
+            sudo kubectl describe pods -n "$K3S_NAMESPACE" -l app.kubernetes.io/instance="$DB_RELEASE_NAME" || true
+            DB_POD="$(sudo kubectl get pod -n "$K3S_NAMESPACE" -l app.kubernetes.io/instance="$DB_RELEASE_NAME" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+            if [ -n "${DB_POD}" ]; then
+              sudo kubectl logs "$DB_POD" -n "$K3S_NAMESPACE" --all-containers=true --tail=200 || true
+            fi
+            exit 1
+          fi
 
       - name: Deploy customer registration app
         run: |

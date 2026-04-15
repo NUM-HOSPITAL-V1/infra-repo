@@ -33,11 +33,11 @@ secrets:
 
 resources:
   requests:
-    memory: "192Mi"
-    cpu: "100m"
+    memory: "128Mi"
+    cpu: "75m"
   limits:
-    memory: "512Mi"
-    cpu: "500m"
+    memory: "384Mi"
+    cpu: "250m"
 
 waitForDatabase:
   enabled: true
@@ -62,8 +62,7 @@ readinessProbe:
   initialDelaySeconds: 20
   periodSeconds: 10
 
-nodeSelector:
-  node-role: worker
+nodeSelector: {}
 
 affinity: {}
 

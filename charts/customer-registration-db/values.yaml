@@ -33,11 +33,11 @@ persistence:
 
 resources:
   requests:
-    memory: "96Mi"
+    memory: "64Mi"
     cpu: "50m"
   limits:
-    memory: "256Mi"
-    cpu: "250m"
+    memory: "128Mi"
+    cpu: "150m"
 
 livenessProbe:
   tcpSocket:
@@ -51,8 +51,7 @@ readinessProbe:
   initialDelaySeconds: 10
   periodSeconds: 10
 
-nodeSelector:
-  node-role: worker
+nodeSelector: {}
 
 affinity: {}
 

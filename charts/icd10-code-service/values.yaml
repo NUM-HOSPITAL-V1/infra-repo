@@ -15,11 +15,11 @@ service:
 
 resources:
   requests:
-    memory: "128Mi"
-    cpu: "100m"
+    memory: "96Mi"
+    cpu: "75m"
   limits:
-    memory: "512Mi"
-    cpu: "500m"
+    memory: "256Mi"
+    cpu: "250m"
 
 livenessProbe:
   httpGet:
@@ -35,8 +35,7 @@ readinessProbe:
   initialDelaySeconds: 10
   periodSeconds: 10
 
-nodeSelector:
-  node-role: worker
+nodeSelector: {}
 
 affinity: {}
 
