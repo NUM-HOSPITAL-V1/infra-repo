@@ -70,6 +70,10 @@ spec:
               value: {{ .Values.env.hospitalPublicKey | quote }}
             - name: HOSPITAL_PRIVATE_KEY
               value: {{ .Values.env.hospitalPrivateKey | quote }}
+          {{- with .Values.startupProbe }}
+          startupProbe:
+            {{- toYaml . | nindent 12 }}
+          {{- end }}
           livenessProbe:
             {{- toYaml .Values.livenessProbe | nindent 12 }}
           readinessProbe:

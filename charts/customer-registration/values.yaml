@@ -48,18 +48,26 @@ waitForDatabase:
   host: customer-registration-db.num.svc.cluster.local
   port: 5432
 
+startupProbe:
+  httpGet:
+    path: /internal/customers/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 18
+
 livenessProbe:
   httpGet:
     path: /internal/customers/health
     port: http
-  initialDelaySeconds: 40
+  initialDelaySeconds: 90
   periodSeconds: 15
 
 readinessProbe:
   httpGet:
     path: /internal/customers/health
     port: http
-  initialDelaySeconds: 20
+  initialDelaySeconds: 60
   periodSeconds: 10
 
 nodeSelector: {}
