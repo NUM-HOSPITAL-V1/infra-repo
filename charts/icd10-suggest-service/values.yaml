@@ -14,7 +14,7 @@ service:
   targetPort: 8080
 
 env:
-  icd10ApiUrl: "http://icd10-code-service:8082/api/icd10"
+  icd10ApiUrl: "http://icd10-code-service.num.svc.cluster.local:8082/api/icd10"
   springDatasourceUrl: "jdbc:h2:file:/data/hospital_db"
   springH2ConsoleEnabled: "false"
 
@@ -34,18 +34,26 @@ persistence:
   size: 1Gi
   accessMode: ReadWriteOnce
 
+startupProbe:
+  httpGet:
+    path: /api/diagnosis/health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 10
+  failureThreshold: 18
+
 livenessProbe:
   httpGet:
     path: /api/diagnosis/health
     port: http
-  initialDelaySeconds: 30
+  initialDelaySeconds: 90
   periodSeconds: 15
 
 readinessProbe:
   httpGet:
     path: /api/diagnosis/health
     port: http
-  initialDelaySeconds: 30
+  initialDelaySeconds: 60
   periodSeconds: 10
 
 nodeSelector: {}
