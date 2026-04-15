@@ -16,7 +16,7 @@ on:
 
 jobs:
   deploy:
-    runs-on: [self-hosted, Linux, X64]
+    runs-on: [self-hosted]
     environment: production
 
     env:
