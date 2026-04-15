@@ -14,11 +14,11 @@ service:
   targetPort: 80
 
 frontend:
-  serviceName: hospital-frontend
+  serviceName: hospital-frontend.num.svc.cluster.local
   servicePort: 3000
 
 backend:
-  serviceName: hospital-backend
+  serviceName: hospital-backend.num.svc.cluster.local
   servicePort: 8000
   authValidationPath: /api/auth/validate
 
