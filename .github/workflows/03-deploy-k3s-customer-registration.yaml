@@ -173,6 +173,11 @@ jobs:
           sudo kubectl describe deployment/"$DB_RELEASE_NAME" -n "$K3S_NAMESPACE"
           sudo kubectl describe deployment/"$APP_RELEASE_NAME" -n "$K3S_NAMESPACE"
           sudo kubectl describe pods -n "$K3S_NAMESPACE"
+          APP_POD="$(sudo kubectl get pod -n "$K3S_NAMESPACE" -l app.kubernetes.io/instance="$APP_RELEASE_NAME" -o jsonpath='{.items[0].metadata.name}' 2>/dev/null || true)"
+          if [ -n "${APP_POD}" ]; then
+            sudo kubectl logs "$APP_POD" -n "$K3S_NAMESPACE" --all-containers=true --tail=200 || true
+            sudo kubectl logs "$APP_POD" -n "$K3S_NAMESPACE" --all-containers=true --previous --tail=200 || true
+          fi
           sudo kubectl get events -n "$K3S_NAMESPACE" --sort-by=.metadata.creationTimestamp | tail -n 100
 
       - name: Verify
