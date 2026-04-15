@@ -3,8 +3,7 @@ controller:
   hostNetwork: true
   dnsPolicy: ClusterFirstWithHostNet
 
-  nodeSelector:
-    node-role: worker
+  nodeSelector: {}
 
   hostPort:
     enabled: true
