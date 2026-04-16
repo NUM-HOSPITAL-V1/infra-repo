@@ -156,3 +156,81 @@ import {
   to = module.security.aws_security_group.worker
   id = "sg-0d7ebce78163822e9"
 }
+
+# Control SG ingress rules
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-22-22-0.0.0.0_0"]
+  id = "sgr-0f1a661e1e94e80a1"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-80-80-0.0.0.0_0"]
+  id = "sgr-03d7d54d67c28bd86"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-443-443-0.0.0.0_0"]
+  id = "sgr-0b84c7c82424883bb"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-6443-6443-0.0.0.0_0"]
+  id = "sgr-0a5cc4f9211b06a48"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-3000-3003-0.0.0.0_0"]
+  id = "sgr-08c72d5628eb68822"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["-1-0-0-172.31.0.0_16"]
+  id = "sgr-02e86867a25d081a4"
+}
+
+# Control SG egress rules
+import {
+  to = module.security.aws_vpc_security_group_egress_rule.control["-1-0-0-0.0.0.0_0"]
+  id = "sgr-0602e9dc9b833e3cb"
+}
+
+# Worker SG ingress rules
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-22-22-0.0.0.0_0"]
+  id = "sgr-02e190eb8b700a3ce"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-80-80-0.0.0.0_0"]
+  id = "sgr-0047ab959602648e9"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-443-443-0.0.0.0_0"]
+  id = "sgr-0d669c52babfbf5f2"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-6443-6443-0.0.0.0_0"]
+  id = "sgr-0cf68995dc7f3f1da"
+}
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["-1-0-0-172.31.0.0_16"]
+  id = "sgr-0dbe8911add65e170"
+}
+
+# Worker SG egress rules
+import {
+  to = module.security.aws_vpc_security_group_egress_rule.worker["-1-0-0-0.0.0.0_0"]
+  id = "sgr-0e5ee8c281994acfc"
+}
+
+# EC2 instances
+import {
+  to = module.compute.aws_instance.control
+  id = "i-016e2b71f6bbb50b8"
+}
+import {
+  to = module.compute.aws_instance.worker
+  id = "i-0e59445bec89b5653"
+}
+import {
+  to = module.compute.aws_instance.worker2
+  id = "i-0a7943eb33b0717ba"
+}
+import {
+  to = module.compute.aws_instance.worker3
+  id = "i-0c563683c57f69ae6"
+}
