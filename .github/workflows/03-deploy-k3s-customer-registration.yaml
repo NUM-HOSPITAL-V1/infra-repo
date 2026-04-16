@@ -140,7 +140,7 @@ jobs:
             --create-namespace \
             --set secrets.create=false \
             --set secrets.existingSecret=customer-registration-db-secrets \
-            --set persistence.enabled=false \
+            --set persistence.enabled=true \
             --wait --timeout 600s; then
             sudo kubectl get pods -n "$K3S_NAMESPACE" -o wide || true
             sudo kubectl describe deployment/"$DB_RELEASE_NAME" -n "$K3S_NAMESPACE" || true
@@ -163,7 +163,6 @@ jobs:
             --set image.tag=$IMAGE_TAG \
             --set secrets.create=false \
             --set secrets.existingSecret=customer-registration-secrets \
-            --set nodeSelector."kubernetes\\.io/hostname"=ip-172-31-16-124 \
             --wait --timeout 600s
 
       - name: Debug rollout on failure
