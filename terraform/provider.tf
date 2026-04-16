@@ -1,12 +1,12 @@
 terraform {
   required_version = ">= 1.5.0"
 
-  backend "s3" {
-    bucket         = "hospital-backend-tfstate-859449724739-eun1"
-    key            = "hospital-backend/terraform.tfstate"
-    region         = "eu-north-1"
-    dynamodb_table = "hospital-backend-tf-locks"
-  }
+  # backend "s3" {
+  #   bucket         = "hospital-tfstate-NEW_ACCOUNT_ID-use1"
+  #   key            = "hospital/terraform.tfstate"
+  #   region         = "us-east-1"
+  #   dynamodb_table = "hospital-tf-locks"
+  # }
 
   required_providers {
     aws = {

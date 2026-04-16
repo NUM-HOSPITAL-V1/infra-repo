@@ -99,6 +99,18 @@ variable "worker2_ami_id" {
   default     = "ami-0974a2c5ddf10f442"
 }
 
+variable "worker3_ami_id" {
+  description = "AMI ID for the worker3 node EC2 instance."
+  type        = string
+  default     = "ami-0974a2c5ddf10f442"
+}
+
+variable "worker3_instance_name" {
+  description = "Name tag for the worker3 EC2 instance."
+  type        = string
+  default     = "worker-node-3"
+}
+
 variable "worker_instance_type" {
   description = "EC2 instance type for the worker node."
   type        = string

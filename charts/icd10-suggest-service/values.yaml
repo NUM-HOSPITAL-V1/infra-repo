@@ -18,6 +18,14 @@ env:
   springDatasourceUrl: "jdbc:h2:file:/data/hospital_db"
   springH2ConsoleEnabled: "false"
 
+dependencyWait:
+  enabled: true
+  image:
+    repository: curlimages/curl
+    tag: "8.7.1"
+    pullPolicy: IfNotPresent
+  timeoutSeconds: 300
+
 resources:
   requests:
     memory: "128Mi"

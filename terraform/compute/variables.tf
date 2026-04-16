@@ -24,6 +24,15 @@ variable "worker2_ami_id" {
   nullable = true
 }
 
+variable "worker3_ami_id" {
+  type     = string
+  nullable = true
+}
+
+variable "worker3_instance_name" {
+  type = string
+}
+
 variable "worker_instance_type" {
   type = string
 }

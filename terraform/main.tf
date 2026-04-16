@@ -32,10 +32,12 @@ module "compute" {
   instance_name         = var.instance_name
   worker_ami_id         = var.worker_ami_id
   worker2_ami_id        = var.worker2_ami_id
+  worker3_ami_id        = var.worker3_ami_id
   worker_instance_type  = var.worker_instance_type
   worker_key_name       = var.worker_key_name
   worker_instance_name  = var.worker_instance_name
   worker2_instance_name = var.worker2_instance_name
+  worker3_instance_name = var.worker3_instance_name
   control_sg_id         = module.security.control_sg_id
   worker_sg_id          = module.security.worker_sg_id
 }
@@ -53,6 +55,11 @@ moved {
 moved {
   from = aws_instance.worker2
   to   = module.compute.aws_instance.worker2
+}
+
+moved {
+  from = aws_instance.worker3
+  to   = module.compute.aws_instance.worker3
 }
 
 moved {

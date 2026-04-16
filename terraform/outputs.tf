@@ -42,3 +42,13 @@ output "worker2_instance_public_ip" {
   description = "Public IP address of the worker2 node."
   value       = module.compute.worker2_instance_public_ip
 }
+
+output "worker3_instance_id" {
+  description = "EC2 instance ID for worker3 node."
+  value       = module.compute.worker3_instance_id
+}
+
+output "worker3_instance_public_ip" {
+  description = "Public IP address of the worker3 node."
+  value       = module.compute.worker3_instance_public_ip
+}

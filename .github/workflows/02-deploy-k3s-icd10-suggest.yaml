@@ -76,6 +76,12 @@ jobs:
         run: |
           sudo kubectl create namespace $K3S_NAMESPACE --dry-run=client -o yaml | sudo kubectl apply -f -
 
+      - name: Ensure ICD10 Code Service is ready
+        run: |
+          set -euo pipefail
+          sudo kubectl rollout status deployment/icd10-code-service -n $K3S_NAMESPACE --timeout=600s
+          sudo kubectl wait --for=condition=available deployment/icd10-code-service -n $K3S_NAMESPACE --timeout=600s
+
       - name: Deploy ICD10 Suggest Service (Helm)
         run: |
           helm upgrade --install $RELEASE_NAME ./charts/icd10-suggest-service \

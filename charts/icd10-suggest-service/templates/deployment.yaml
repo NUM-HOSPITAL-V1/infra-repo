@@ -16,6 +16,26 @@ spec:
       labels:
         {{- include "icd10-suggest-service.selectorLabels" . | nindent 8 }}
     spec:
+      {{- if .Values.dependencyWait.enabled }}
+      initContainers:
+        - name: wait-for-icd10-code-service
+          image: "{{ .Values.dependencyWait.image.repository }}:{{ .Values.dependencyWait.image.tag }}"
+          imagePullPolicy: {{ .Values.dependencyWait.image.pullPolicy }}
+          command:
+            - sh
+            - -c
+            - >
+              timeout={{ .Values.dependencyWait.timeoutSeconds }};
+              until curl -fsS "{{ .Values.env.icd10ApiUrl }}" > /dev/null; do
+                timeout=$((timeout - 5));
+                if [ "$timeout" -le 0 ]; then
+                  echo "Timed out waiting for icd10-code-service";
+                  exit 1;
+                fi;
+                echo "Waiting for icd10-code-service...";
+                sleep 5;
+              done
+      {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
         {{- toYaml . | nindent 8 }}

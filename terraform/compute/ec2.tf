@@ -36,3 +36,16 @@ resource "aws_instance" "worker2" {
     Name = var.worker2_instance_name
   }
 }
+
+resource "aws_instance" "worker3" {
+  ami           = coalesce(var.worker3_ami_id, var.ami_id)
+  instance_type = var.worker_instance_type
+  key_name      = coalesce(var.worker_key_name, var.key_name)
+  vpc_security_group_ids = [
+    var.worker_sg_id
+  ]
+
+  tags = {
+    Name = var.worker3_instance_name
+  }
+}
