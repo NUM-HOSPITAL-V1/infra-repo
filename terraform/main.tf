@@ -146,3 +146,13 @@ moved {
   from = module.security.aws_vpc_security_group_egress_rule.worker["0"]
   to   = module.security.aws_vpc_security_group_egress_rule.worker["-1-0-0-0.0.0.0_0"]
 }
+
+import {
+  to = module.security.aws_security_group.control
+  id = "sg-07cfa872554229632"
+}
+
+import {
+  to = module.security.aws_security_group.worker
+  id = "sg-0d7ebce78163822e9"
+}
