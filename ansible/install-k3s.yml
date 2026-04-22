@@ -66,7 +66,7 @@
       shell: |
         curl -sfL https://get.k3s.io | \
           K3S_URL=https://{{ hostvars[groups['control'][0]]['control_private_ip'] }}:6443 \
-          K3S_TOKEN={{ hostvars[groups['control'][0]]['k3s_token']['stdout'] }} \
+          K3S_TOKEN={{ hostvars[groups['control'][0]]['k3s_token']['stdout'] | trim }} \
           sh -
       args:
         creates: /usr/local/bin/k3s
