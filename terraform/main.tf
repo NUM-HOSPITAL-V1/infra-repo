@@ -42,6 +42,17 @@ module "compute" {
   worker_sg_id          = module.security.worker_sg_id
 }
 
+# Import existing security groups into Terraform state
+import {
+  to = module.security.aws_security_group.control
+  id = "sg-0a7805255b846aec8"
+}
+
+import {
+  to = module.security.aws_security_group.worker
+  id = "sg-04d4185c11e869327"
+}
+
 # Import existing EC2 instances into Terraform state
 import {
   to = module.compute.aws_instance.control
