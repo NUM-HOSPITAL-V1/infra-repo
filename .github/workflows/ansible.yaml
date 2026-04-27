@@ -1,14 +1,23 @@
 name: Ansible Setup
-run-name: "Ansible | ${{ github.event_name }} | ${{ github.ref_name }}"
+run-name: "Ansible | ${{ github.event.inputs.target_env }} | ${{ github.ref_name }}"
 
 on:
   workflow_dispatch:
+    inputs:
+      target_env:
+        description: "Суулгах орчин"
+        required: true
+        type: choice
+        options:
+          - staging
+          - prod
 
 permissions:
   contents: read
 
 jobs:
-  setup:
+  setup-staging:
+    if: github.event.inputs.target_env == 'staging'
     runs-on: ubuntu-latest
     environment: staging
     timeout-minutes: 20
@@ -16,36 +25,51 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install ansible
-        run: |
-          set -euo pipefail
-          sudo apt update
-          sudo apt install -y ansible
-
-      - name: Validate SSH secret
-        run: |
-          set -euo pipefail
-          test -n "${{ secrets.SERVER_SSH_KEY }}" || (echo "SERVER_SSH_KEY is empty" && exit 1)
+        run: sudo apt update && sudo apt install -y ansible
 
       - name: Setup SSH key
         run: |
-          set -euo pipefail
           mkdir -p "$HOME/.ssh"
           printf '%s\n' "${{ secrets.SERVER_SSH_KEY }}" | tr -d '\r' > "$HOME/.ssh/id_rsa"
           chmod 600 "$HOME/.ssh/id_rsa"
 
-      - name: Add host keys for all nodes
+      - name: Add host keys
         run: |
-          set -euo pipefail
           ssh-keyscan -T 10 -H 16.170.208.203 >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 13.61.2.126   >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 16.170.246.73  >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 13.60.163.72   >> "$HOME/.ssh/known_hosts"
           chmod 600 "$HOME/.ssh/known_hosts"
 
-      - name: Run Ansible
+      - name: Run Ansible (K3s)
         run: |
-          set -euo pipefail
           ansible-playbook \
-            -i ansible/inventory.ini \
+            -i ansible/inventories/staging/inventory.ini \
             --private-key "$HOME/.ssh/id_rsa" \
             ansible/install-k3s.yml
+
+  setup-prod:
+    if: github.event.inputs.target_env == 'prod'
+    runs-on: ubuntu-latest
+    environment: production
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install ansible + sshpass
+        run: sudo apt update && sudo apt install -y ansible sshpass
+
+      - name: Add host key
+        run: |
+          mkdir -p "$HOME/.ssh"
+          ssh-keyscan -T 10 -H ${{ secrets.SERVER_HOST }} >> "$HOME/.ssh/known_hosts"
+          chmod 600 "$HOME/.ssh/known_hosts"
+
+      - name: Run Ansible (Docker)
+        run: |
+          ansible-playbook \
+            -i ansible/inventories/prod/inventory.ini \
+            ansible/install-docker.yml \
+            --extra-vars "prod_ssh_password=${{ secrets.SERVER_SSH_PASSWORD }}"
+        env:
+          ANSIBLE_HOST_KEY_CHECKING: "False"

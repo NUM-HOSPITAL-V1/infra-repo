@@ -1,0 +1,93 @@
+services:
+
+  nginx:
+    image: nginx:1.27-alpine
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx.conf:/etc/nginx/conf.d/default.conf:ro
+    depends_on:
+      - hospital-backend
+      - hospital-frontend
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost/gateway-health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+
+  hospital-backend:
+    image: ${BACKEND_IMAGE}:${BACKEND_TAG}
+    environment:
+      MONGO_URI: ${MONGODB_URI}
+      JWT_SECRET: ${JWT_SECRET}
+      REFRESH_SECRET: ${REFRESH_SECRET}
+      ICD10_SUGGEST_BASE_URL: http://icd10-suggest-service:8080/api
+      ICD10_SUGGEST_TIMEOUT_MS: "5000"
+      CUSTOMER_REGISTRATION_BASE_URL: http://customer-registration:8081
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8000/api/health"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  hospital-frontend:
+    image: ${FRONTEND_IMAGE}:${FRONTEND_TAG}
+    restart: unless-stopped
+
+  icd10-code-service:
+    image: ${ICD10_CODE_IMAGE}:${ICD10_CODE_TAG}
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:8082/api/icd10"]
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 30s
+
+  icd10-suggest-service:
+    image: ${ICD10_SUGGEST_IMAGE}:${ICD10_SUGGEST_TAG}
+    environment:
+      ICD10_API_URL: http://icd10-code-service:8082/api/icd10
+      SPRING_DATASOURCE_URL: jdbc:h2:file:/data/hospital_db
+      SPRING_H2_CONSOLE_ENABLED: "false"
+    volumes:
+      - icd10-suggest-data:/data
+    depends_on:
+      icd10-code-service:
+        condition: service_healthy
+    restart: unless-stopped
+
+  customer-registration:
+    image: ${CUSTOMER_REG_IMAGE}:${CUSTOMER_REG_TAG}
+    environment:
+      SERVER_PORT: "8081"
+      SPRING_DATASOURCE_URL: jdbc:postgresql://customer-registration-db:5432/customer_db
+      SPRING_DATASOURCE_USERNAME: ${CUSTOMER_DB_USERNAME}
+      SPRING_DATASOURCE_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+    depends_on:
+      customer-registration-db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  customer-registration-db:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_DB: customer_db
+      POSTGRES_USER: ${CUSTOMER_DB_USERNAME}
+      POSTGRES_PASSWORD: ${CUSTOMER_DB_PASSWORD}
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${CUSTOMER_DB_USERNAME} -d customer_db"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  icd10-suggest-data:
+  postgres-data:

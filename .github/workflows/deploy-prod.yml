@@ -1,0 +1,150 @@
+name: Deploy to Prod (Docker Compose)
+run-name: "Prod Deploy | ${{ github.event.action }} | ${{ github.event_name }}"
+
+on:
+  repository_dispatch:
+    types:
+      - backend_image_built
+      - frontend_image_built
+      - icd10_code_image_built
+      - icd10_suggest_image_built
+      - customer_registration_image_built
+  workflow_dispatch:
+    inputs:
+      service:
+        description: "Deploy хийх сервис"
+        required: true
+        type: choice
+        options:
+          - hospital-backend
+          - hospital-frontend
+          - icd10-code-service
+          - icd10-suggest-service
+          - customer-registration
+      image_tag:
+        description: "Docker image tag (v1.2.3)"
+        required: true
+      image_repo:
+        description: "Docker image repository"
+        required: true
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Resolve deploy inputs
+        id: resolve
+        run: |
+          set -euo pipefail
+
+          EVENT="${{ github.event_name }}"
+
+          if [ "$EVENT" = "repository_dispatch" ]; then
+            IMAGE_TAG='${{ github.event.client_payload.image_tag }}'
+            IMAGE_REPO='${{ github.event.client_payload.image_repo }}'
+
+            case "${{ github.event.action }}" in
+              backend_image_built)              SERVICE="hospital-backend" ;;
+              frontend_image_built)             SERVICE="hospital-frontend" ;;
+              icd10_code_image_built)           SERVICE="icd10-code-service" ;;
+              icd10_suggest_image_built)        SERVICE="icd10-suggest-service" ;;
+              customer_registration_image_built) SERVICE="customer-registration" ;;
+            esac
+          else
+            IMAGE_TAG='${{ github.event.inputs.image_tag }}'
+            IMAGE_REPO='${{ github.event.inputs.image_repo }}'
+            SERVICE='${{ github.event.inputs.service }}'
+          fi
+
+          if ! echo "${IMAGE_TAG}" | grep -Eq '^v[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "Invalid image tag: ${IMAGE_TAG}"
+            exit 1
+          fi
+
+          echo "service=${SERVICE}"    >> "$GITHUB_OUTPUT"
+          echo "image_tag=${IMAGE_TAG}" >> "$GITHUB_OUTPUT"
+          echo "image_repo=${IMAGE_REPO}" >> "$GITHUB_OUTPUT"
+          echo "Deploying ${SERVICE} → ${IMAGE_REPO}:${IMAGE_TAG}"
+
+      - name: Copy prod files to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host:     ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          source: "prod/docker-compose.yml,prod/nginx.conf"
+          target: /opt/hospital
+          strip_components: 1
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1
+        env:
+          SERVICE:    ${{ steps.resolve.outputs.service }}
+          IMAGE_REPO: ${{ steps.resolve.outputs.image_repo }}
+          IMAGE_TAG:  ${{ steps.resolve.outputs.image_tag }}
+          MONGODB_URI:          ${{ secrets.MONGODB_URI }}
+          JWT_SECRET:           ${{ secrets.JWT_SECRET }}
+          REFRESH_SECRET:       ${{ secrets.REFRESH_SECRET }}
+          CUSTOMER_DB_USERNAME: ${{ secrets.CUSTOMER_DB_USERNAME }}
+          CUSTOMER_DB_PASSWORD: ${{ secrets.CUSTOMER_DB_PASSWORD }}
+          DOCKER_USERNAME:      ${{ secrets.DOCKER_USERNAME }}
+        with:
+          host:     ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          envs: SERVICE,IMAGE_REPO,IMAGE_TAG,MONGODB_URI,JWT_SECRET,REFRESH_SECRET,CUSTOMER_DB_USERNAME,CUSTOMER_DB_PASSWORD,DOCKER_USERNAME
+          script: |
+            set -euo pipefail
+            cd /opt/hospital
+
+            # Tag тохирох env var нэрийг тодорхойлох
+            case "$SERVICE" in
+              hospital-backend)        TAG_VAR="BACKEND_TAG" ;;
+              hospital-frontend)       TAG_VAR="FRONTEND_TAG" ;;
+              icd10-code-service)      TAG_VAR="ICD10_CODE_TAG" ;;
+              icd10-suggest-service)   TAG_VAR="ICD10_SUGGEST_TAG" ;;
+              customer-registration)   TAG_VAR="CUSTOMER_REG_TAG" ;;
+            esac
+
+            # Анхны deploy бол .env.tags-г placeholder-аар эхлүүлэх
+            if [ ! -f .env.tags ]; then
+              cat > .env.tags << 'TAGSEOF'
+BACKEND_TAG=none
+FRONTEND_TAG=none
+ICD10_CODE_TAG=none
+ICD10_SUGGEST_TAG=none
+CUSTOMER_REG_TAG=none
+TAGSEOF
+            fi
+
+            # Шинэ tag-г .env.tags файлд хадгалах (бусад сервисийн tag хэвээр үлдэнэ)
+            sed -i "/^${TAG_VAR}=/d" .env.tags
+            echo "${TAG_VAR}=${IMAGE_TAG}" >> .env.tags
+
+            # Secrets + image configs + tags нэгтгэж .env үүсгэх
+            cat > .env << ENVEOF
+            MONGODB_URI=${MONGODB_URI}
+            JWT_SECRET=${JWT_SECRET}
+            REFRESH_SECRET=${REFRESH_SECRET}
+            CUSTOMER_DB_USERNAME=${CUSTOMER_DB_USERNAME}
+            CUSTOMER_DB_PASSWORD=${CUSTOMER_DB_PASSWORD}
+            BACKEND_IMAGE=${DOCKER_USERNAME}/hospital-backend
+            FRONTEND_IMAGE=${DOCKER_USERNAME}/hospital-front-end
+            ICD10_CODE_IMAGE=nurlannn/icd10-code-service
+            ICD10_SUGGEST_IMAGE=nurlannn/icd10-suggest-service
+            CUSTOMER_REG_IMAGE=${DOCKER_USERNAME}/customer-registration-service
+            ENVEOF
+
+            # Бүх сервисийн одоогийн tag-уудыг .env-д нэмэх
+            cat .env.tags >> .env
+
+            # Шинэ image татаж зөвхөн тэр сервисийг restart
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env pull "$SERVICE"
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps "$SERVICE"
+
+            # Байдал шалгах
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env ps
