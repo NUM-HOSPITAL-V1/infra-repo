@@ -112,13 +112,7 @@ jobs:
 
             # Анхны deploy бол .env.tags-г placeholder-аар эхлүүлэх
             if [ ! -f .env.tags ]; then
-              cat > .env.tags << 'TAGSEOF'
-BACKEND_TAG=none
-FRONTEND_TAG=none
-ICD10_CODE_TAG=none
-ICD10_SUGGEST_TAG=none
-CUSTOMER_REG_TAG=none
-TAGSEOF
+              printf 'BACKEND_TAG=none\nFRONTEND_TAG=none\nICD10_CODE_TAG=none\nICD10_SUGGEST_TAG=none\nCUSTOMER_REG_TAG=none\n' > .env.tags
             fi
 
             # Шинэ tag-г .env.tags файлд хадгалах (бусад сервисийн tag хэвээр үлдэнэ)
