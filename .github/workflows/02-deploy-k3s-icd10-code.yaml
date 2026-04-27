@@ -16,7 +16,7 @@ on:
 jobs:
   deploy:
     runs-on: [self-hosted, Linux, X64]
-    environment: production
+    environment: staging
 
     env:
       K3S_NAMESPACE: num
