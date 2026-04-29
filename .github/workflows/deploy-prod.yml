@@ -4,11 +4,11 @@ run-name: "Prod Deploy | ${{ github.event.action }} | ${{ github.event_name }}"
 on:
   repository_dispatch:
     types:
-      - backend_image_built
-      - frontend_image_built
-      - icd10_code_image_built
-      - icd10_suggest_image_built
-      - customer_registration_image_built
+      - backend_staging_deployed
+      - frontend_staging_deployed
+      - icd10_code_staging_deployed
+      - icd10_suggest_staging_deployed
+      - customer_registration_staging_deployed
   workflow_dispatch:
     inputs:
       service:
@@ -48,11 +48,11 @@ jobs:
             IMAGE_REPO='${{ github.event.client_payload.image_repo }}'
 
             case "${{ github.event.action }}" in
-              backend_image_built)              SERVICE="hospital-backend" ;;
-              frontend_image_built)             SERVICE="hospital-frontend" ;;
-              icd10_code_image_built)           SERVICE="icd10-code-service" ;;
-              icd10_suggest_image_built)        SERVICE="icd10-suggest-service" ;;
-              customer_registration_image_built) SERVICE="customer-registration" ;;
+              backend_staging_deployed)              SERVICE="hospital-backend" ;;
+              frontend_staging_deployed)             SERVICE="hospital-frontend" ;;
+              icd10_code_staging_deployed)           SERVICE="icd10-code-service" ;;
+              icd10_suggest_staging_deployed)        SERVICE="icd10-suggest-service" ;;
+              customer_registration_staging_deployed) SERVICE="customer-registration" ;;
             esac
           else
             IMAGE_TAG='${{ github.event.inputs.image_tag }}'
