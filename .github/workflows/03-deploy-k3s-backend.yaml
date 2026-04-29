@@ -130,20 +130,21 @@ jobs:
           sudo kubectl get pods -n $K3S_NAMESPACE
           sudo kubectl get svc -n $K3S_NAMESPACE
 
-      - name: Trigger prod deploy
-        if: success()
-        env:
-          GH_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
-        run: |
-          curl -fsSL -X POST \
-            -H "Accept: application/vnd.github+json" \
-            -H "Authorization: Bearer ${GH_TOKEN}" \
-            -H "X-GitHub-Api-Version: 2022-11-28" \
-            "https://api.github.com/repos/${{ github.repository }}/dispatches" \
-            -d "{
-              \"event_type\":\"backend_staging_deployed\",
-              \"client_payload\":{
-                \"image_tag\":\"${IMAGE_TAG}\",
-                \"image_repo\":\"${IMAGE_REPO}\"
-              }
-            }"
+      # TODO: staging тогтворжсоны дараа comment-г арилгаж staging→prod дараалал идэвхжүүлэх
+      # - name: Trigger prod deploy
+      #   if: success()
+      #   env:
+      #     GH_TOKEN: ${{ secrets.DEPLOY_REPO_TOKEN }}
+      #   run: |
+      #     curl -fsSL -X POST \
+      #       -H "Accept: application/vnd.github+json" \
+      #       -H "Authorization: Bearer ${GH_TOKEN}" \
+      #       -H "X-GitHub-Api-Version: 2022-11-28" \
+      #       "https://api.github.com/repos/${{ github.repository }}/dispatches" \
+      #       -d "{
+      #         \"event_type\":\"backend_staging_deployed\",
+      #         \"client_payload\":{
+      #           \"image_tag\":\"${IMAGE_TAG}\",
+      #           \"image_repo\":\"${IMAGE_REPO}\"
+      #         }
+      #       }"
