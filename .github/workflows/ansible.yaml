@@ -70,7 +70,7 @@ jobs:
           ansible-playbook \
             -i ansible/inventories/prod/inventory.ini \
             ansible/install-docker.yml \
-            --extra-vars "prod_ssh_password=$PROD_SSH_PASSWORD"
+            --extra-vars "ansible_password=$PROD_SSH_PASSWORD ansible_become_pass=$PROD_SSH_PASSWORD"
         env:
           ANSIBLE_HOST_KEY_CHECKING: "False"
           PROD_SSH_PASSWORD: ${{ secrets.SERVER_SSH_PASSWORD }}
