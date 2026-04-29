@@ -1,6 +1,12 @@
 - hosts: control
   become: yes
 
+  handlers:
+    - name: restart containerd
+      systemd:
+        name: containerd
+        state: restarted
+
   tasks:
     - name: Update packages
       apt:
@@ -57,6 +63,21 @@
         name: "{{ ansible_user }}"
         groups: docker
         append: yes
+
+    - name: Reset containerd config
+      file:
+        path: /etc/containerd/config.toml
+        state: absent
+      notify: restart containerd
+
+    - name: Apply containerd restart if config was reset
+      meta: flush_handlers
+
+    - name: Enable and start containerd
+      systemd:
+        name: containerd
+        enabled: yes
+        state: started
 
     - name: Enable and start Docker
       systemd:
