@@ -56,7 +56,14 @@ variable "ingress_rules" {
     protocol    = string
     cidr_ipv4   = string
   }))
-  default = []
+  default = [
+    { from_port = 22,   to_port = 22,   protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 80,   to_port = 80,   protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 443,  to_port = 443,  protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 6443, to_port = 6443, protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 3000, to_port = 3003, protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { protocol = "-1", cidr_ipv4 = "172.31.0.0/16" },
+  ]
 }
 
 variable "manage_ingress_rules" {
@@ -98,7 +105,13 @@ variable "worker_ingress_rules" {
     protocol    = string
     cidr_ipv4   = string
   }))
-  default = []
+  default = [
+    { from_port = 22,   to_port = 22,   protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 80,   to_port = 80,   protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 443,  to_port = 443,  protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { from_port = 6443, to_port = 6443, protocol = "tcp", cidr_ipv4 = "0.0.0.0/0" },
+    { protocol = "-1", cidr_ipv4 = "172.31.0.0/16" },
+  ]
 }
 
 variable "worker_egress_rules" {
