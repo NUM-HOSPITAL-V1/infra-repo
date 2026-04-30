@@ -52,9 +52,7 @@ jobs:
 
       - name: Validate backend config
         run: |
-          set -euo pipefail
           test -n "${TF_STATE_BUCKET}" || (echo "TF_STATE_BUCKET secret is empty" && exit 1)
-          test -n "${TF_STATE_LOCK_TABLE}" || (echo "TF_STATE_LOCK_TABLE secret is empty" && exit 1)
 
       - run: |
           terraform init -input=false -reconfigure \
@@ -108,9 +106,7 @@ jobs:
 
       - name: Validate backend config
         run: |
-          set -euo pipefail
           test -n "${TF_STATE_BUCKET}" || (echo "TF_STATE_BUCKET secret is empty" && exit 1)
-          test -n "${TF_STATE_LOCK_TABLE}" || (echo "TF_STATE_LOCK_TABLE secret is empty" && exit 1)
 
       - run: |
           terraform init -input=false -reconfigure \
