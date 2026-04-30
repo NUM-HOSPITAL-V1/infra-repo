@@ -125,20 +125,20 @@ import {
 # Import existing EC2 instances into Terraform state
 import {
   to = module.compute.aws_instance.control
-  id = "i-035fe7746d4cfc891"
+  id = "i-025344b4425fca1e9"
 }
 
 import {
   to = module.compute.aws_instance.worker
-  id = "i-0fff6fd0298478406"
+  id = "i-0b38ab6893d9a84d6"
 }
 
 import {
   to = module.compute.aws_instance.worker2
-  id = "i-01d456ea1fff60155"
+  id = "i-068ec1e6a8f81c64a"
 }
 
 import {
   to = module.compute.aws_instance.worker3
-  id = "i-0f4c17ffe235b8fbe"
+  id = "i-0fd5ac9e6adb88ede"
 }

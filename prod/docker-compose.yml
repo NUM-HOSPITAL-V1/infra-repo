@@ -12,7 +12,7 @@ services:
       - hospital-frontend
     restart: unless-stopped
     healthcheck:
-      test: ["CMD", "wget", "-qO-", "http://localhost/gateway-health"]
+      test: ["CMD", "wget", "-qO-", "http://127.0.0.1/gateway-health"]
       interval: 30s
       timeout: 5s
       retries: 3
