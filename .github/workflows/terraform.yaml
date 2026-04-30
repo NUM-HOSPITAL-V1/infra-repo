@@ -74,10 +74,6 @@ jobs:
           EOF
         working-directory: terraform
 
-      - name: Reset stale security group state
-        run: terraform state rm 'module.security' || true
-        working-directory: terraform
-
       - run: terraform plan -input=false -no-color -var-file=terraform.tfvars
         working-directory: terraform
 
@@ -130,10 +126,6 @@ jobs:
           worker2_instance_id = "${{ secrets.WORKER2_INSTANCE_ID }}"
           worker3_instance_id = "${{ secrets.WORKER3_INSTANCE_ID }}"
           EOF
-        working-directory: terraform
-
-      - name: Reset stale security group state
-        run: terraform state rm 'module.security' || true
         working-directory: terraform
 
       - run: terraform plan -input=false -no-color -var-file=terraform.tfvars

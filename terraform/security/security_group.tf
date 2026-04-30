@@ -50,6 +50,10 @@ resource "aws_security_group" "control" {
   vpc_id      = var.vpc_id
 
   tags = var.security_group_tags
+
+  lifecycle {
+    ignore_changes = [name, description]
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "control" {
@@ -80,6 +84,10 @@ resource "aws_security_group" "worker" {
   vpc_id      = var.vpc_id
 
   tags = var.worker_security_group_tags
+
+  lifecycle {
+    ignore_changes = [name, description]
+  }
 }
 
 resource "aws_vpc_security_group_ingress_rule" "worker" {
