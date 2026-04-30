@@ -63,6 +63,10 @@ jobs:
             -backend-config="encrypt=true"
         working-directory: terraform
 
+      - name: Clear stale state lock
+        run: |
+          aws s3 rm "s3://${TF_STATE_BUCKET}/${TF_STATE_KEY}.tflock" --region "${AWS_DEFAULT_REGION}" || true
+
       - name: Generate tfvars from secrets
         run: |
           cat > terraform.tfvars << EOF
@@ -116,6 +120,10 @@ jobs:
             -backend-config="use_lockfile=true" \
             -backend-config="encrypt=true"
         working-directory: terraform
+
+      - name: Clear stale state lock
+        run: |
+          aws s3 rm "s3://${TF_STATE_BUCKET}/${TF_STATE_KEY}.tflock" --region "${AWS_DEFAULT_REGION}" || true
 
       - name: Generate tfvars from secrets
         run: |
