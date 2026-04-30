@@ -125,7 +125,7 @@ import {
 # Import existing EC2 instances into Terraform state
 import {
   to = module.compute.aws_instance.control
-  id = "i-039db39acf8d9c072"
+  id = "i-035fe7746d4cfc891"
 }
 
 import {

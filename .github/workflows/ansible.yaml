@@ -35,7 +35,7 @@ jobs:
 
       - name: Add host keys
         run: |
-          ssh-keyscan -T 10 -H 16.170.208.203 >> "$HOME/.ssh/known_hosts"
+          ssh-keyscan -T 10 -H 13.61.104.143 >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 13.61.2.126   >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 16.170.246.73  >> "$HOME/.ssh/known_hosts"
           ssh-keyscan -T 10 -H 13.60.163.72   >> "$HOME/.ssh/known_hosts"
