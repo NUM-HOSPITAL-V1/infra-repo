@@ -1,7 +1,4 @@
 aws_region                 = "eu-north-1"
-ami_id                     = "ami-080254318c2d8932f"
-instance_type              = "t3.micro"
-key_name                   = "april22"
 instance_name              = "Control-plane"
 security_group_name        = "control-node-sg"
 security_group_description = "Security group for control-node"
@@ -21,14 +18,7 @@ egress_rules = [
   { protocol = "-1", cidr_ipv4 = "0.0.0.0/0" }
 ]
 
-worker_ami_id                     = "ami-080254318c2d8932f"
-worker2_ami_id                    = "ami-080254318c2d8932f"
-worker3_ami_id                    = "ami-080254318c2d8932f"
-worker_instance_type              = "t3.micro"
-worker_key_name                   = "april22"
 worker_instance_name              = "Worker-1"
-worker2_instance_name             = "worker-2"
-worker3_instance_name             = "worker-3"
 worker_security_group_name        = "worker-node-sg"
 worker_security_group_description = "Security group for worker-node"
 worker_security_group_tags        = {}
