@@ -62,6 +62,11 @@
           - ca-certificates
         state: present
 
+    - name: Uninstall existing k3s agent if present
+      shell: /usr/local/bin/k3s-agent-uninstall.sh
+      args:
+        removes: /usr/local/bin/k3s-agent-uninstall.sh
+
     - name: Join worker to k3s cluster
       shell: |
         curl -sfL https://get.k3s.io | \
