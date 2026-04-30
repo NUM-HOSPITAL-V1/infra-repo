@@ -1,51 +1,15 @@
-resource "aws_instance" "control" {
-  ami           = var.ami_id
-  instance_type = var.instance_type
-  key_name      = var.key_name
-  vpc_security_group_ids = [
-    var.control_sg_id
-  ]
-
-  tags = {
-    Name = var.instance_name
-  }
+data "aws_instance" "control" {
+  instance_id = var.control_instance_id
 }
 
-resource "aws_instance" "worker" {
-  ami           = coalesce(var.worker_ami_id, var.ami_id)
-  instance_type = var.worker_instance_type
-  key_name      = coalesce(var.worker_key_name, var.key_name)
-  vpc_security_group_ids = [
-    var.worker_sg_id
-  ]
-
-  tags = {
-    Name = var.worker_instance_name
-  }
+data "aws_instance" "worker" {
+  instance_id = var.worker_instance_id
 }
 
-resource "aws_instance" "worker2" {
-  ami           = coalesce(var.worker2_ami_id, var.ami_id)
-  instance_type = var.worker_instance_type
-  key_name      = coalesce(var.worker_key_name, var.key_name)
-  vpc_security_group_ids = [
-    var.worker_sg_id
-  ]
-
-  tags = {
-    Name = var.worker2_instance_name
-  }
+data "aws_instance" "worker2" {
+  instance_id = var.worker2_instance_id
 }
 
-resource "aws_instance" "worker3" {
-  ami           = coalesce(var.worker3_ami_id, var.ami_id)
-  instance_type = var.worker_instance_type
-  key_name      = coalesce(var.worker_key_name, var.key_name)
-  vpc_security_group_ids = [
-    var.worker_sg_id
-  ]
-
-  tags = {
-    Name = var.worker3_instance_name
-  }
+data "aws_instance" "worker3" {
+  instance_id = var.worker3_instance_id
 }

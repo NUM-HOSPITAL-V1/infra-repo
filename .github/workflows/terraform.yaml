@@ -66,8 +66,15 @@ jobs:
             -backend-config="encrypt=true"
         working-directory: terraform
 
-      - name: Validate tfvars file
-        run: test -f terraform.tfvars || (echo "terraform/terraform.tfvars is missing" && exit 1)
+      - name: Generate tfvars from secrets
+        run: |
+          cat > terraform.tfvars << EOF
+          vpc_id              = "${{ secrets.VPC_ID }}"
+          control_instance_id = "${{ secrets.CONTROL_INSTANCE_ID }}"
+          worker_instance_id  = "${{ secrets.WORKER1_INSTANCE_ID }}"
+          worker2_instance_id = "${{ secrets.WORKER2_INSTANCE_ID }}"
+          worker3_instance_id = "${{ secrets.WORKER3_INSTANCE_ID }}"
+          EOF
         working-directory: terraform
 
       - run: terraform plan -input=false -no-color -var-file=terraform.tfvars
@@ -116,8 +123,15 @@ jobs:
             -backend-config="encrypt=true"
         working-directory: terraform
 
-      - name: Validate tfvars file
-        run: test -f terraform.tfvars || (echo "terraform/terraform.tfvars is missing" && exit 1)
+      - name: Generate tfvars from secrets
+        run: |
+          cat > terraform.tfvars << EOF
+          vpc_id              = "${{ secrets.VPC_ID }}"
+          control_instance_id = "${{ secrets.CONTROL_INSTANCE_ID }}"
+          worker_instance_id  = "${{ secrets.WORKER1_INSTANCE_ID }}"
+          worker2_instance_id = "${{ secrets.WORKER2_INSTANCE_ID }}"
+          worker3_instance_id = "${{ secrets.WORKER3_INSTANCE_ID }}"
+          EOF
         working-directory: terraform
 
       - run: terraform plan -input=false -no-color -var-file=terraform.tfvars

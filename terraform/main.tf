@@ -26,20 +26,10 @@ module "security" {
 module "compute" {
   source = "./compute"
 
-  ami_id                = var.ami_id
-  instance_type         = var.instance_type
-  key_name              = var.key_name
-  instance_name         = var.instance_name
-  worker_ami_id         = var.worker_ami_id
-  worker2_ami_id        = var.worker2_ami_id
-  worker3_ami_id        = var.worker3_ami_id
-  worker_instance_type  = var.worker_instance_type
-  worker_key_name       = var.worker_key_name
-  worker_instance_name  = var.worker_instance_name
-  worker2_instance_name = var.worker2_instance_name
-  worker3_instance_name = var.worker3_instance_name
-  control_sg_id         = module.security.control_sg_id
-  worker_sg_id          = module.security.worker_sg_id
+  control_instance_id = var.control_instance_id
+  worker_instance_id  = var.worker_instance_id
+  worker2_instance_id = var.worker2_instance_id
+  worker3_instance_id = var.worker3_instance_id
 }
 
 # Import existing security groups into Terraform state
@@ -121,4 +111,3 @@ import {
   to = module.security.aws_vpc_security_group_egress_rule.worker["-1-0-0-0.0.0.0_0"]
   id = "sgr-07c65a2031b4c42c7"
 }
-

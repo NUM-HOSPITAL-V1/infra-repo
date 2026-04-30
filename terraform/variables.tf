@@ -1,58 +1,54 @@
 variable "aws_region" {
-  description = "AWS region where resources are created."
+  description = "AWS region"
   type        = string
   default     = "eu-north-1"
 }
 
-variable "ami_id" {
-  description = "AMI ID for the control node EC2 instance."
+variable "vpc_id" {
+  description = "VPC ID"
   type        = string
-  default     = "ami-0974a2c5ddf10f442"
 }
 
-variable "instance_type" {
-  description = "EC2 instance type for the control node."
+# --- Instance IDs (user provides after manual creation) ---
+
+variable "control_instance_id" {
+  description = "Control node EC2 instance ID (e.g. i-0abc123)"
   type        = string
-  default     = "t3.micro"
 }
 
-variable "key_name" {
-  description = "Existing EC2 key pair name."
+variable "worker_instance_id" {
+  description = "Worker 1 EC2 instance ID"
   type        = string
-  default     = "hospital-key"
 }
 
-variable "instance_name" {
-  description = "Name tag for the EC2 instance."
+variable "worker2_instance_id" {
+  description = "Worker 2 EC2 instance ID"
   type        = string
-  default     = "control-node"
 }
+
+variable "worker3_instance_id" {
+  description = "Worker 3 EC2 instance ID"
+  type        = string
+}
+
+# --- Security groups ---
 
 variable "security_group_name" {
-  description = "Security group name for the control node."
-  type        = string
-  default     = "control-node-sg"
+  type    = string
+  default = "control-node-sg"
 }
 
 variable "security_group_description" {
-  description = "Security group description."
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "security_group_tags" {
-  description = "Tags for the security group."
-  type        = map(string)
-  default     = {}
-}
-
-variable "vpc_id" {
-  description = "VPC ID where the control security group will be created."
-  type        = string
+  type    = map(string)
+  default = {}
 }
 
 variable "ingress_rules" {
-  description = "Inbound rules for the instance security group."
   type = list(object({
     description = optional(string)
     from_port   = optional(number)
@@ -64,13 +60,11 @@ variable "ingress_rules" {
 }
 
 variable "manage_ingress_rules" {
-  description = "Whether Terraform manages ingress rules."
-  type        = bool
-  default     = true
+  type    = bool
+  default = true
 }
 
 variable "egress_rules" {
-  description = "Outbound rules for the instance security group."
   type = list(object({
     description = optional(string)
     from_port   = optional(number)
@@ -78,83 +72,25 @@ variable "egress_rules" {
     protocol    = string
     cidr_ipv4   = string
   }))
-  default = [
-    {
-      protocol  = "-1"
-      cidr_ipv4 = "0.0.0.0/0"
-    }
-  ]
-}
-
-variable "worker_ami_id" {
-  description = "AMI ID for the worker node EC2 instance."
-  type        = string
-  default     = "ami-0974a2c5ddf10f442"
-}
-
-
-variable "worker2_ami_id" {
-  description = "AMI ID for the worker node EC2 instance."
-  type        = string
-  default     = "ami-0974a2c5ddf10f442"
-}
-
-variable "worker3_ami_id" {
-  description = "AMI ID for the worker3 node EC2 instance."
-  type        = string
-  default     = "ami-0974a2c5ddf10f442"
-}
-
-variable "worker3_instance_name" {
-  description = "Name tag for the worker3 EC2 instance."
-  type        = string
-  default     = "worker-node-3"
-}
-
-variable "worker_instance_type" {
-  description = "EC2 instance type for the worker node."
-  type        = string
-  default     = "t3.micro"
-}
-
-variable "worker_key_name" {
-  description = "Existing EC2 key pair name for worker."
-  type        = string
-  default     = null
-}
-
-variable "worker_instance_name" {
-  description = "Name tag for the worker EC2 instance."
-  type        = string
-  default     = "worker-node"
-}
-
-variable "worker2_instance_name" {
-  description = "Name tag for the worker EC2 instance."
-  type        = string
-  default     = "extra-worker"
+  default = [{ protocol = "-1", cidr_ipv4 = "0.0.0.0/0" }]
 }
 
 variable "worker_security_group_name" {
-  description = "Security group name for the worker node."
-  type        = string
-  default     = "worker-node-sg"
+  type    = string
+  default = "worker-node-sg"
 }
 
 variable "worker_security_group_description" {
-  description = "Worker security group description."
-  type        = string
-  default     = null
+  type    = string
+  default = null
 }
 
 variable "worker_security_group_tags" {
-  description = "Tags for the worker security group."
-  type        = map(string)
-  default     = {}
+  type    = map(string)
+  default = {}
 }
 
 variable "worker_ingress_rules" {
-  description = "Inbound rules for the worker security group."
   type = list(object({
     description = optional(string)
     from_port   = optional(number)
@@ -166,7 +102,6 @@ variable "worker_ingress_rules" {
 }
 
 variable "worker_egress_rules" {
-  description = "Outbound rules for the worker security group."
   type = list(object({
     description = optional(string)
     from_port   = optional(number)
@@ -174,10 +109,15 @@ variable "worker_egress_rules" {
     protocol    = string
     cidr_ipv4   = string
   }))
-  default = [
-    {
-      protocol  = "-1"
-      cidr_ipv4 = "0.0.0.0/0"
-    }
-  ]
+  default = [{ protocol = "-1", cidr_ipv4 = "0.0.0.0/0" }]
+}
+
+variable "instance_name" {
+  type    = string
+  default = "control-node"
+}
+
+variable "worker_instance_name" {
+  type    = string
+  default = "worker-node"
 }
