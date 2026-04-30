@@ -42,3 +42,23 @@ import {
   to = module.security.aws_security_group.worker
   id = "sg-0ca594dfe71710a25"
 }
+
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.control["tcp-22-22-0.0.0.0_0"]
+  id = "sgr-034c4c77ab11a4fbc"
+}
+
+import {
+  to = module.security.aws_vpc_security_group_egress_rule.control["-1-0-0-0.0.0.0_0"]
+  id = "sgr-01b44f9ce94164db2"
+}
+
+import {
+  to = module.security.aws_vpc_security_group_ingress_rule.worker["tcp-22-22-0.0.0.0_0"]
+  id = "sgr-02c8c63beb239d20e"
+}
+
+import {
+  to = module.security.aws_vpc_security_group_egress_rule.worker["-1-0-0-0.0.0.0_0"]
+  id = "sgr-01f12fdcba40e3044"
+}
