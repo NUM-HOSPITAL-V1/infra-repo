@@ -80,6 +80,28 @@ jobs:
           target: /opt/hospital
           strip_components: 1
 
+      - name: Login to Docker Hub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Pull image and save as tarball
+        run: |
+          IMAGE="${{ steps.resolve.outputs.image_repo }}:${{ steps.resolve.outputs.image_tag }}"
+          docker pull "$IMAGE"
+          docker save "$IMAGE" | gzip > deploy-image.tar.gz
+          echo "Tarball size: $(du -sh deploy-image.tar.gz | cut -f1)"
+
+      - name: Transfer image tarball to server
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host:     ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          password: ${{ secrets.SERVER_SSH_PASSWORD }}
+          source: "deploy-image.tar.gz"
+          target: "/tmp/"
+
       - name: Deploy via SSH
         uses: appleboy/ssh-action@v1
         env:
@@ -136,8 +158,11 @@ jobs:
             # Бүх сервисийн одоогийн tag-уудыг .env-д нэмэх
             cat .env.tags >> .env
 
-            # Шинэ image татаж зөвхөн тэр сервисийг restart
-            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env pull "$SERVICE"
+            # Runner дээр татаж ирсэн image-г load хийх (docker pull биш)
+            docker load < /tmp/deploy-image.tar.gz
+            rm /tmp/deploy-image.tar.gz
+
+            # Зөвхөн тэр сервисийг restart (local image ашиглах)
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps "$SERVICE"
 
             # Байдал шалгах
