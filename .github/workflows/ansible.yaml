@@ -72,24 +72,28 @@ jobs:
       - name: Build dynamic inventory
         run: |
           mkdir -p "$HOME/.ssh"
-          cat > /tmp/inventory.ini << EOF
-          [control]
-          ${{ steps.tf.outputs.control_ip }} ansible_user=ubuntu
+          CONTROL_IP="${{ steps.tf.outputs.control_ip }}"
+          WORKER1_IP="${{ steps.tf.outputs.worker1_ip }}"
+          WORKER2_IP="${{ steps.tf.outputs.worker2_ip }}"
+          WORKER3_IP="${{ steps.tf.outputs.worker3_ip }}"
 
-          [workers]
-          ${{ steps.tf.outputs.worker1_ip }} ansible_user=ubuntu
-          ${{ steps.tf.outputs.worker2_ip }} ansible_user=ubuntu
-          ${{ steps.tf.outputs.worker3_ip }} ansible_user=ubuntu
+          printf '[control]\n' > /tmp/inventory.ini
+          printf '%s ansible_user=ubuntu\n' "$CONTROL_IP" >> /tmp/inventory.ini
+          printf '\n[workers]\n' >> /tmp/inventory.ini
+          for ip in "$WORKER1_IP" "$WORKER2_IP" "$WORKER3_IP"; do
+            if [ -n "$ip" ]; then
+              printf '%s ansible_user=ubuntu\n' "$ip" >> /tmp/inventory.ini
+            else
+              echo "WARNING: One worker IP is empty — skipping from inventory" >&2
+            fi
+          done
+          printf '\n[all:children]\ncontrol\nworkers\n' >> /tmp/inventory.ini
 
-          [all:children]
-          control
-          workers
-          EOF
+          cat /tmp/inventory.ini
 
-          ssh-keyscan -T 10 -H ${{ steps.tf.outputs.control_ip }} >> "$HOME/.ssh/known_hosts" || true
-          ssh-keyscan -T 10 -H ${{ steps.tf.outputs.worker1_ip }} >> "$HOME/.ssh/known_hosts" || true
-          ssh-keyscan -T 10 -H ${{ steps.tf.outputs.worker2_ip }} >> "$HOME/.ssh/known_hosts" || true
-          ssh-keyscan -T 10 -H ${{ steps.tf.outputs.worker3_ip }} >> "$HOME/.ssh/known_hosts" || true
+          for ip in "$CONTROL_IP" "$WORKER1_IP" "$WORKER2_IP" "$WORKER3_IP"; do
+            [ -n "$ip" ] && ssh-keyscan -T 10 -H "$ip" >> "$HOME/.ssh/known_hosts" 2>/dev/null || true
+          done
           chmod 600 "$HOME/.ssh/known_hosts"
 
       - name: Run Ansible (K3s)
