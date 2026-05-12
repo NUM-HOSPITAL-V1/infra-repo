@@ -9,7 +9,7 @@ on:
       - icd10_code_image_built
       - icd10_suggest_image_built
       - customer_registration_image_built
-  workflow_dispatch:
+  workflow_dispatch:  
     inputs:
       service:
         description: "Deploy хийх сервис"
@@ -76,7 +76,7 @@ jobs:
           host:     ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
-          source: "prod/docker-compose.yml,prod/nginx.conf"
+          source: "prod/docker-compose.yml,prod/nginx.conf,prod/master.conf"
           target: /opt/hospital
           strip_components: 1
 
@@ -164,6 +164,9 @@ jobs:
 
             # Зөвхөн тэр сервисийг restart (local image ашиглах)
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps "$SERVICE"
+
+            # Master nginx үргэлж ажиллаж байх (эхний удаа эхлүүлэх, аль хэдийн байвал skip)
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps master-nginx
 
             # Байдал шалгах
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env ps
