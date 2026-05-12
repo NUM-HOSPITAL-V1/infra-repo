@@ -162,11 +162,17 @@ jobs:
             docker load < /tmp/deploy-image.tar.gz
             rm /tmp/deploy-image.tar.gz
 
+            # Infra сервисүүд (DB-ууд) үргэлж ажиллаж байх — ажиллаж байвал skip
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d mongodb customer-registration-db
+
             # Зөвхөн тэр сервисийг restart (local image ашиглах)
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps "$SERVICE"
 
-            # Master nginx үргэлж ажиллаж байх (эхний удаа эхлүүлэх, аль хэдийн байвал skip)
+            # Master nginx үргэлж ажиллаж байх
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps master-nginx
+
+            # nginx — frontend+backend healthy болсон бол эхлүүлэх оролдлого (амжихгүй бол skip)
+            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps nginx 2>/dev/null || true
 
             # Байдал шалгах
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env ps
