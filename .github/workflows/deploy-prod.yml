@@ -90,8 +90,8 @@ jobs:
         run: |
           IMAGE="${{ steps.resolve.outputs.image_repo }}:${{ steps.resolve.outputs.image_tag }}"
           docker pull "$IMAGE"
-          docker save "$IMAGE" | gzip > deploy-image.tar.gz
-          echo "Tarball size: $(du -sh deploy-image.tar.gz | cut -f1)"
+          docker save "$IMAGE" | gzip > deploy-${{ steps.resolve.outputs.service }}-image.tar.gz
+          echo "Tarball size: $(du -sh deploy-${{ steps.resolve.outputs.service }}-image.tar.gz | cut -f1)"
 
       - name: Transfer image tarball to server
         uses: appleboy/scp-action@v0.1.7
@@ -99,7 +99,7 @@ jobs:
           host:     ${{ secrets.SERVER_HOST }}
           username: ${{ secrets.SERVER_USER }}
           password: ${{ secrets.SERVER_SSH_PASSWORD }}
-          source: "deploy-image.tar.gz"
+          source: "deploy-${{ steps.resolve.outputs.service }}-image.tar.gz"
           target: "/tmp/"
 
       - name: Deploy via SSH
@@ -159,8 +159,8 @@ jobs:
             cat .env.tags >> .env
 
             # Runner дээр татаж ирсэн image-г load хийх (docker pull биш)
-            docker load < /tmp/deploy-image.tar.gz
-            rm /tmp/deploy-image.tar.gz
+            docker load < /tmp/deploy-${SERVICE}-image.tar.gz
+            rm /tmp/deploy-${SERVICE}-image.tar.gz
 
             # Infra сервисүүд (DB-ууд) үргэлж ажиллаж байх — ажиллаж байвал skip
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d mongodb customer-registration-db
