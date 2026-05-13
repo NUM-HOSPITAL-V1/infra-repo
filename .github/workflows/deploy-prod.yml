@@ -168,9 +168,6 @@ jobs:
             # Зөвхөн тэр сервисийг restart (local image ашиглах)
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps "$SERVICE"
 
-            # Master nginx үргэлж ажиллаж байх
-            docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps master-nginx
-
             # nginx — frontend+backend healthy болсон бол эхлүүлэх оролдлого (амжихгүй бол skip)
             docker compose -f /opt/hospital/docker-compose.yml --env-file /opt/hospital/.env up -d --no-deps nginx 2>/dev/null || true
 
