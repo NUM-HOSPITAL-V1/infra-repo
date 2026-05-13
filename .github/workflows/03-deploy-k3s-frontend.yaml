@@ -3,7 +3,7 @@ run-name: "Deploy K3s | ${{ github.event_name }}"
 
 on:
   repository_dispatch:
-    types: [frontend_image_built]
+    types: [frontend_k3s_image_built]
   workflow_dispatch:
     inputs:
       image_tag:
