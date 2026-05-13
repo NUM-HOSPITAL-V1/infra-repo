@@ -35,6 +35,10 @@ data:
             return 200 "gateway-ok\n";
         }
 
+        location = / {
+            return 302 /hospital/;
+        }
+
         location = /api {
             return 301 /api/;
         }
